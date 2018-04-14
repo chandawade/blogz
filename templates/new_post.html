@@ -1,0 +1,39 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<h1>Add a Blog Post</h1>
+<form method='post'>
+    Title:
+    <br>
+        <input type='text' name='title' value='{{title}}'/>
+        <p class="error">{{title_error}}</p>
+    <br>
+    What's On Your Mind:
+    <br>
+        <textarea name="body" value='{{body}}'></textarea>
+        <p class="error">{{body_error}}</p>
+    <br>
+
+    <input type='submit' value='Add Post' />
+    
+</form>
+
+<hr /> 
+
+{% if title|length == 0 %}
+<p>No Posts Found</p>
+{% else %}
+
+    <ul>
+        {% for titles in title %}</ul>
+        <li>{{title.name}}</li>
+            <form action="/add-blog-post" method="POST" style = "display:inline-block;">
+                <input type = "hidden" name="blog-id" value={{blog.id}}" />
+                <input type = "submit" value="Add!" />
+            </form>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+{% endblock %}
