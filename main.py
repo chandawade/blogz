@@ -32,15 +32,15 @@ def index():
     return redirect('/blog')
 
 # DISPLAYS ONE POST OR ALL BLOG POSTS    
-@app.route('/blog')
+@app.route('/blog', methods=['POST', 'GET'])
 def main_blog():
-    blog_id = request.args.get('id')
-    if (blog_id):
-        blog = Blog.query.get(blog_id)
-        return render_template("one_entry.html")
+    entry_id = request.args.get('id')
+    if (entry_id):
+        entry = Blog.query.get(entry_id)
+        return render_template("one_entry.html", title="Post", entry=entry)
     else:
         all_blogs = Blog.query.all()
-    return render_template("all_blogs.html", title="Review All Posts", all_blogs=all_blogs)
+        return render_template("all_blogs.html", title="Review All Posts", all_blogs=all_blogs)
 
 # DISPLAYS THE FORM, CREATES THE NEW POST, AND RE-RENDERS FORM IF NECESSARY
 @app.route("/newpost", methods=['GET', 'POST'])
@@ -55,7 +55,7 @@ def new_post():
         if new_post.empty():        
             db.session.add(new_post) # this passes in the object 
             db.session.commit()  # this pushes changes to DB 
-
+    
             url = "/blog?id=" + str(new_post.id)
             return redirect(url)
         else:
