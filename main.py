@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -9,72 +9,62 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = "thisIsasecretkey23!dd"
 
-#this is the constructor 
+# this is the constructor & stores all posts
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(180))
     body = db.Column(db.String(1000))
  
-    def __init__(self, body, title):
+    def __init__(self, title, body):
+        self.title = title
         self.body = body
-        self.title =title
+        
+    # CHECKS FOR VALID POSTS
+    def empty(self):
+        if self.title and self.body:
+            return True
+        else:
+            return False
 
-# DISPLAYS ALL THE BLOG POSTS
-@app.route('/blog')
+
+@app.route("/")
 def index():
-    return render_template("blog.html")
+    return redirect('/blog')
 
-# CHECKS FOR EMPTY CHARACTERS 
-@app.route("/newpost")
-def empty(x):
-    if x:
-        return True
+# DISPLAYS ONE POST OR ALL BLOG POSTS    
+@app.route('/blog')
+def main_blog():
+    blog_id = request.args.get('id')
+    if (blog_id):
+        blog = Blog.query.get(blog_id)
+        return render_template("one_entry.html")
     else:
-        return False
+        all_blogs = Blog.query.all()
+    return render_template("all_blogs.html", title="Review All Posts", all_blogs=all_blogs)
 
-# VALIDATES CHARACTERS IN FORM INPUTS
+# DISPLAYS THE FORM, CREATES THE NEW POST, AND RE-RENDERS FORM IF NECESSARY
 @app.route("/newpost", methods=['GET', 'POST'])
-def blog():
-    title=request.form['title']
-    body=request.form['body']
-    title_error = ''
-    body_error= ''
-
-    if not empty(title):
-        title_error = "Please add a title"
-        body_error = ''
-    else:
-        title=title
-        title = ''
-    
-    if not empty(body):
-        body_error = "Please add content to your blog"
-        title_error = ''
-    else:
-        body = body
-        body = ''
-
+def new_post():
 # ALLOWS USER TO ADD A NEW BLOG POST
     if request.method == 'POST':
         title_name = request.form['title'] # this grabs info submitted from form to do "something" with it
-        new_title = Blog(title_name) # this is a title object that will be added to DB
-        db.session.add(new_title) # this passes in the object 
-        db.session.commit()  # this pushes changes to DB 
-
-    title = Blog.query.all()
-
-    if request.method == 'POST':
         body_name = request.form['body']
-        new_body = Blog(body_name)
-        db.session.add(new_body)
-        db.session.commit()
 
-    body = Blog.query.all()
-        
-    return render_template("new_post.html", title=title, body=body)
-    redirect ("/blog")
-         
+        new_post = Blog(title_name, body_name) # this is a title object that will be added to DB
 
+        if new_post.empty():        
+            db.session.add(new_post) # this passes in the object 
+            db.session.commit()  # this pushes changes to DB 
+
+            url = "/blog?id=" + str(new_post.id)
+            return redirect(url)
+        else:
+            flash("Please enter a title and share what's on your mind")
+            return render_template("new_post.html", title_name=title_name, body_name=body_name)
+       
+    else:
+        return render_template("new_post.html")
+    #redirect ("/blog")
 
 
 if __name__ == "__main__":
