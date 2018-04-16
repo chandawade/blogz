@@ -26,7 +26,6 @@ class Blog(db.Model):
         else:
             return False
 
-
 @app.route("/")
 def index():
     return redirect('/blog')
@@ -64,8 +63,6 @@ def new_post():
        
     else:
         return render_template("new_post.html")
-    #redirect ("/blog")
-
 
 if __name__ == "__main__":
     app.run()
