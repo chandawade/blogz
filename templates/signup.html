@@ -11,6 +11,10 @@
             </td>
             <td>
                 <input name="username" type="username" value="{{ username }}">
+                <p class ="error">{{username_error}}</p> 
+            </td>
+            <td>
+                <span>Username Required</span>
             </td>
         </tr>
         <tr>
@@ -19,11 +23,16 @@
             </td>
             <td>
                 <input name="password" type="password">
+                <p class="error">{{password_error}}</p>
+            </td>
+            <td>
+                <span>Password Required. Must have at least 3 characters</span>
             </td>
         </tr>
         <tr>
             <td>
                 <label for="verify">Re-enter Password:</label>
+                <p class="error">{{verify_error}}</p>
             </td>
             <td>
                 <input name="verify" type="password">
