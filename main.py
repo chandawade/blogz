@@ -70,21 +70,26 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         verify = request.form['verify']
+        existing_user = User.query.filter_by(username=username).first()
 
         # TODO validate user's data
         if username == "":
             flash("Username required")
         if password == "":
             flash("Password Required. Must have at least 3 characters")
+            return render_template("signup.html")
         elif " " in password or " "  in username:
             flash("Username or Password cannot contain any spaces")
+            return render_template("signup.html")
         elif len(username) <= 2 or len(password)<=2:
             flash("Username & Password must be at least 3 characters")
+            return render_template("signup.html")
         else:
             if password != verify:
                 flash("Passwords must match")
+                return render_template("signup.html")
+               
         
-        existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash("Username taken. Enter another username")
 
